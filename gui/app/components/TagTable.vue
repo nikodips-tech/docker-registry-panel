@@ -203,11 +203,15 @@ function others(t: TagRow): string[] {
         <div
           v-for="t in visible"
           :key="t.tag"
-          class="trow"
+          class="trow clickable"
           role="row"
+          tabindex="0"
           :class="{ checked: checked.has(t.tag), open: !checked.has(t.tag) && openTag === t.tag }"
+          :aria-label="`Show details for ${t.tag}`"
+          @click="emit('open', t.tag)"
+          @keydown.enter.self="emit('open', t.tag)"
         >
-          <label>
+          <label @click.stop>
             <input
               type="checkbox"
               :checked="checked.has(t.tag)"
@@ -217,14 +221,10 @@ function others(t: TagRow): string[] {
             >
           </label>
           <div class="cell">
-            <button
-              type="button"
-              class="mono tag-link ell"
+            <span
+              class="mono tag-name ell"
               :title="t.tag"
-              @click="emit('open', t.tag)"
-            >
-              {{ t.tag }}
-            </button>
+            >{{ t.tag }}</span>
             <span
               v-if="t.tag === newest"
               class="tag-badge ok"
@@ -262,7 +262,10 @@ function others(t: TagRow): string[] {
             class="muted"
             :title="t.error ?? formatDate(t.created)"
           >{{ t.error ? '—' : relativeTime(t.created) }}</span>
-          <div class="actions">
+          <div
+            class="actions"
+            @click.stop
+          >
             <button
               type="button"
               class="btn icon"
