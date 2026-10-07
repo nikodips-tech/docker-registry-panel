@@ -19,7 +19,7 @@ const D_CHILD_AMD64 = ociIndex.manifests[0].digest as string
 /** A fake registry with two repositories. Every child of the index resolves to the amd64 child. */
 function fakeClient() {
   const tags: Record<string, Record<string, string>> = {
-    'backend/api': { 'v1.0.0': D_DOCKER, 'latest': D_DOCKER },
+    'backend/api': { 'v1.0.0': D_DOCKER, 'latest': D_DOCKER, 'dangling': 'sha256:' + 'd'.repeat(64) },
     'infra/alpine': { '3.20': D_INDEX },
   }
   const manifests: Record<string, ManifestResponse> = {
@@ -101,20 +101,49 @@ describe('resolveReference', () => {
   })
 })
 
+describe('resolveReference: index with missing platform manifests', () => {
+  it('keeps digest and platforms and reports the missing ones', async () => {
+    const { client } = fakeClient()
+    const broken = {
+      ...ociIndex,
+      manifests: [{ ...ociIndex.manifests[0], digest: 'sha256:' + 'e'.repeat(64) }, ociIndex.manifests[1]],
+    }
+    const D_BROKEN = 'sha256:' + 'f'.repeat(64)
+    const original = client.getManifest
+    client.getManifest = async (name, ref) => (ref === D_BROKEN ? { digest: D_BROKEN, mediaType: ociIndex.mediaType, size: 1, body: broken } : original(name, ref))
+    const r = await resolveReference(client, 'infra/alpine', D_BROKEN, true)
+    expect(r.kind).toBe('index')
+    expect(r.platforms).toEqual(['linux/amd64'])
+    expect(r.images).toEqual([])
+    expect(r.error).toMatch(/missing on the registry: linux\/amd64/)
+  })
+})
+
 describe('resolveTags', () => {
+  it('keeps a row for a tag whose manifest cannot be read', async () => {
+    const { client } = fakeClient()
+    const t = await resolveTags(client, 'backend/api', 60)
+    const broken = t.tags.find(r => r.tag === 'dangling')!
+    expect(broken.error).toMatch(/nope/)
+    expect(broken.digest).toBe('sha256:' + 'd'.repeat(64))
+    expect(broken.size).toBe(0)
+    expect(t.tags.at(-1)!.tag).toBe('dangling') // errored rows sort last
+    expect(t.uniqueDigests).toBe(2) // the dangling digest is still a digest
+  })
+
   it('builds the table, newest first, and caches it per repository', async () => {
     const { client, calls } = fakeClient()
     const t = await resolveTags(client, 'backend/api', 60)
-    expect(t.tags.map(r => r.tag)).toEqual(['latest', 'v1.0.0'])
+    expect(t.tags.map(r => r.tag)).toEqual(['latest', 'v1.0.0', 'dangling'])
     expect(t.tags[0]!.digest).toBe(D_DOCKER)
-    expect(t.uniqueDigests).toBe(1)
+    expect(t.uniqueDigests).toBe(2)
     expect(t.compressedSize).toBe(dockerManifest.layers.reduce((s: number, l: { size: number }) => s + l.size, 0))
     expect(t.tags[0]!.size).toBe(t.compressedSize + dockerManifest.config.size)
     const headsAfterFirst = calls.heads
     await resolveTags(client, 'backend/api', 60)
     expect(calls.heads).toBe(headsAfterFirst)
     await resolveTags(client, 'backend/api', 60, true)
-    expect(calls.heads).toBe(headsAfterFirst + 2)
+    expect(calls.heads).toBe(headsAfterFirst + 3)
   })
 })
 

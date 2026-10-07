@@ -33,7 +33,7 @@ watch(() => props.name, () => {
 /** Tags grouped by digest, to flag shared digests. */
 const byDigest = computed(() => {
   const m = new Map<string, string[]>()
-  for (const t of props.tags) m.set(t.digest, [...(m.get(t.digest) ?? []), t.tag])
+  for (const t of props.tags) if (t.digest) m.set(t.digest, [...(m.get(t.digest) ?? []), t.tag])
   return m
 })
 /** The API returns rows newest first; the first one with a build date is "newest". */
@@ -45,7 +45,11 @@ const visible = computed(() => {
   if (props.sort === 'name') list.sort((a, b) => compareTags(a.tag, b.tag))
   return list
 })
-const allVisibleChecked = computed(() => visible.value.length > 0 && visible.value.every(t => props.checked.has(t.tag)))
+const brokenCount = computed(() => props.tags.filter(t => t.error).length)
+const allVisibleChecked = computed(() => {
+  const selectable = visible.value.filter(t => t.digest)
+  return selectable.length > 0 && selectable.every(t => props.checked.has(t.tag))
+})
 
 function others(t: TagRow): string[] {
   return (byDigest.value.get(t.digest) ?? []).filter(x => x !== t.tag)
@@ -134,6 +138,14 @@ function others(t: TagRow): string[] {
   </div>
 
   <div
+    v-if="!error && brokenCount"
+    class="alert"
+  >
+    <AppIcon name="warn" />
+    <span>{{ brokenCount }} {{ brokenCount === 1 ? 'tag points' : 'tags point' }} at a manifest the registry cannot serve, so size and date are unknown and a pull would fail. This usually means a garbage collection removed the platform manifests of a multi-arch image. Hover the badge for details.</span>
+  </div>
+
+  <div
     v-if="error"
     class="alert error"
     role="alert"
@@ -166,7 +178,7 @@ function others(t: TagRow): string[] {
               :checked="allVisibleChecked"
               :disabled="!visible.length"
               aria-label="Select all visible tags"
-              @change="emit('checkAll', visible.map(t => t.tag), ($event.target as HTMLInputElement).checked)"
+              @change="emit('checkAll', visible.filter(t => t.digest).map(t => t.tag), ($event.target as HTMLInputElement).checked)"
             >
           </label>
           <span>Tag</span><span>Digest</span><span class="right">Size</span><span>Platforms</span><span>Created</span><span />
@@ -199,6 +211,7 @@ function others(t: TagRow): string[] {
             <input
               type="checkbox"
               :checked="checked.has(t.tag)"
+              :disabled="!t.digest"
               :aria-label="`Select tag ${t.tag}`"
               @change="emit('check', t.tag, ($event.target as HTMLInputElement).checked)"
             >
@@ -216,13 +229,18 @@ function others(t: TagRow): string[] {
               v-if="t.tag === newest"
               class="tag-badge ok"
             >newest</span>
+            <span
+              v-if="t.error"
+              class="tag-badge danger"
+              :title="t.error"
+            >manifest unavailable</span>
           </div>
           <div class="cell">
             <span
               class="mono ell"
               style="font-size:12px;color:var(--muted)"
               :title="t.digest"
-            >{{ t.digest.split(':')[0] }}:{{ shortDigest(t.digest) }}</span>
+            >{{ t.digest ? `${t.digest.split(':')[0]}:${shortDigest(t.digest)}` : '—' }}</span>
             <span
               v-if="others(t).length"
               class="tag-badge warn"
@@ -232,7 +250,7 @@ function others(t: TagRow): string[] {
           <span
             class="mono right"
             style="font-size:13px"
-          >{{ formatBytes(t.size) }}</span>
+          >{{ t.error ? '—' : formatBytes(t.size) }}</span>
           <div class="archs">
             <span
               v-for="p in t.platforms"
@@ -242,8 +260,8 @@ function others(t: TagRow): string[] {
           </div>
           <span
             class="muted"
-            :title="formatDate(t.created)"
-          >{{ relativeTime(t.created) }}</span>
+            :title="t.error ?? formatDate(t.created)"
+          >{{ t.error ? '—' : relativeTime(t.created) }}</span>
           <div class="actions">
             <button
               type="button"
@@ -258,6 +276,7 @@ function others(t: TagRow): string[] {
               />
             </button>
             <button
+              v-if="!t.error || t.digest"
               type="button"
               class="btn icon"
               :aria-label="`Show details for ${t.tag}`"
@@ -270,7 +289,7 @@ function others(t: TagRow): string[] {
               />
             </button>
             <button
-              v-if="deleteEnabled"
+              v-if="deleteEnabled && t.digest"
               type="button"
               class="btn icon danger"
               :aria-label="`Delete ${t.tag}`"

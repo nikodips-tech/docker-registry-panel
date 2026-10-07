@@ -85,6 +85,8 @@ export interface TagRow {
   platforms: string[]
   /** Build date (config blob `created`), never a push date. */
   created: string | null
+  /** Set when the manifest could not be read; size, platforms and created are then empty. */
+  error?: string
 }
 
 export interface TagsResponse {

@@ -111,6 +111,15 @@ const pull = computed(() => pullCommand(props.pullUrl, props.name, props.tag))
         </div>
 
         <div
+          v-if="detail.error"
+          class="alert error"
+          role="alert"
+        >
+          <AppIcon name="warn" />
+          <span>{{ detail.error }}. The tag cannot be pulled; it can still be deleted by digest.</span>
+        </div>
+
+        <div
           v-if="detail.sharedWith.length"
           class="alert"
         >
