@@ -1,0 +1,23 @@
+# Example deployment next to a private registry. Copy to docker-compose.yml and adjust.
+# The GUI container replaces joxit/docker-registry-ui one to one: the browser only talks
+# to the GUI, the GUI talks to the registry with the credentials below.
+services:
+  registry-gui:
+    build: ./gui
+    # or, once published:
+    # image: registry.example.com/tools/docker-registry-gui:latest
+    restart: unless-stopped
+    environment:
+      REGISTRY_URL: https://registry.example.com
+      REGISTRY_USERNAME: ${REGISTRY_USERNAME}
+      REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}
+      # REGISTRY_TITLE: registry.example.com
+      # PULL_URL: registry.example.com
+      DELETE_IMAGES: "true"
+      SHOW_TAG_COUNT: "false"
+      CATALOG_MIN_BRANCHES: "1"
+      CATALOG_MAX_BRANCHES: "1"
+      CACHE_TTL_SECONDS: "60"
+      THEME: auto
+    ports:
+      - "8080:3000"
