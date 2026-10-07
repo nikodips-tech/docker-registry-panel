@@ -10,6 +10,7 @@ export default defineEventHandler(async (): Promise<HealthResponse> => {
     pullUrl: cfg.pullUrl,
     deleteEnabled: cfg.deleteEnabled,
     showTagCount: cfg.showTagCount,
+    theme: cfg.theme,
     catalogMinBranches: cfg.catalogMinBranches,
     catalogMaxBranches: cfg.catalogMaxBranches,
   }

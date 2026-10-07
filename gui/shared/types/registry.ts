@@ -13,6 +13,8 @@ export interface HealthResponse {
   /** Whether delete buttons are enabled (DELETE_IMAGES). */
   deleteEnabled: boolean
   showTagCount: boolean
+  /** Default theme from THEME: 'auto', 'light' or 'dark'. */
+  theme: 'auto' | 'light' | 'dark'
   catalogMinBranches: number
   catalogMaxBranches: number
   apiVersion: string | null
