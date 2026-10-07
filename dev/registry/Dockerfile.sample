@@ -1,0 +1,15 @@
+FROM alpine:3.20
+ARG VERSION=0.0.0
+ARG REVISION=unknown
+ARG EXTRA=
+LABEL org.opencontainers.image.title="backend/api" \
+      org.opencontainers.image.version="$VERSION" \
+      org.opencontainers.image.revision="$REVISION" \
+      org.opencontainers.image.source="https://git.example.com/backend/api"
+RUN apk add --no-cache ca-certificates tzdata
+WORKDIR /app
+COPY seed.sh /app/api
+RUN echo "$VERSION $EXTRA" > /app/VERSION
+ENV APP_ENV=production
+EXPOSE 8080
+ENTRYPOINT ["/bin/sh", "/app/api"]
