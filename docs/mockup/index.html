@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker Registry GUI · mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ---------- Theme tokens ---------- */
+:root{
+  --bg:#F3F5F8;--surface:#FFFFFF;--surface2:#EBEFF4;--border:#D9DFE8;--text:#141A22;--muted:#56626F;
+  --accent:#1F4FE0;--accent-soft:#E4EBFF;--accent-text:#1A43C2;
+  --danger:#C62828;--danger-soft:#FCE8E8;--ok:#1B7F4B;--ok-soft:#DFF3E7;--warn:#8A5200;--warn-soft:#FFF0D6;
+  --topbar:#0F172A;--topbar-text:#F1F5F9;--topbar-muted:#A8B3C4;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+}
+:root[data-theme="dark"]{
+  --bg:#0E1217;--surface:#151B23;--surface2:#1D2530;--border:#2A3442;--text:#E8EDF3;--muted:#9AA7B5;
+  --accent:#6C8CFF;--accent-soft:#1E2A4A;--accent-text:#A9BCFF;
+  --danger:#F28B8B;--danger-soft:#3A1F22;--ok:#5BD08A;--ok-soft:#163626;--warn:#F2B35B;--warn-soft:#3A2D14;
+  --topbar:#090D13;--topbar-text:#E8EDF3;--topbar-muted:#7F8B9A;
+  --shadow:0 1px 2px rgba(0,0,0,.5);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1217;--surface:#151B23;--surface2:#1D2530;--border:#2A3442;--text:#E8EDF3;--muted:#9AA7B5;
+    --accent:#6C8CFF;--accent-soft:#1E2A4A;--accent-text:#A9BCFF;
+    --danger:#F28B8B;--danger-soft:#3A1F22;--ok:#5BD08A;--ok-soft:#163626;--warn:#F2B35B;--warn-soft:#3A2D14;
+    --topbar:#090D13;--topbar-text:#E8EDF3;--topbar-muted:#7F8B9A;
+    --shadow:0 1px 2px rgba(0,0,0,.5);
+  }
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.45 'IBM Plex Sans',system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+input{font:inherit;color:inherit}
+::placeholder{color:var(--muted);opacity:1}
+a{color:var(--accent-text)}a:hover{color:var(--accent)}
+.mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+svg{flex:none}
+.app{position:relative;min-height:100vh;display:flex;flex-direction:column}
+
+/* ---------- Top bar ---------- */
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:10px 20px;background:var(--topbar);color:var(--topbar-text)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--topbar-text);text-decoration:none;font-weight:600;font-size:16px;letter-spacing:-.01em}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;color:#fff}
+.pill{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--topbar-text)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.spacer{flex:1 1 40px}
+.search{display:flex;align-items:center;gap:8px;flex:0 1 340px;min-width:180px;height:34px;padding:0 12px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--topbar-muted)}
+.search input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--topbar-text)}
+.iconbtn{width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);display:inline-flex;align-items:center;justify-content:center;color:var(--topbar-text)}
+
+/* ---------- Layout ---------- */
+.layout{flex:1;display:flex;flex-wrap:wrap;align-items:stretch}
+.sidebar{flex:1 1 260px;max-width:100%;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+@media (min-width:900px){.sidebar{max-width:300px}}
+.content{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;padding:24px 28px 40px;gap:20px}
+@media (max-width:600px){.content{padding:16px}}
+.drawer{flex:0 0 380px;max-width:100%;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column}
+
+/* ---------- Sidebar ---------- */
+.side-head{padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px}
+.side-title{display:flex;justify-content:space-between;align-items:baseline}
+.side-title h2{margin:0;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.side-title span{font-size:12px;color:var(--muted)}
+.filter{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--muted)}
+.filter input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:13px}
+.tree{display:flex;flex-direction:column;padding:4px 8px 12px;gap:1px}
+.tree button{display:flex;align-items:center;gap:8px;width:100%;height:36px;padding:0 8px;border-radius:7px;text-align:left}
+.tree button:hover{background:var(--surface2)}
+.tree .group{font-weight:500}
+.tree .chev{color:var(--muted);transition:transform .15s}
+.tree .group[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.tree .folder{color:var(--warn)}
+.tree .label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree .count{font-size:12px;color:var(--muted)}
+.tree .item.current{background:var(--accent-soft);color:var(--accent-text);font-weight:500}
+.tree .item .cube{opacity:.8}
+.badge{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface2);color:var(--muted)}
+
+/* ---------- Common ---------- */
+.card{border-radius:10px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)}
+.chip{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--surface2);color:var(--muted)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.tag-badge{font-size:11px;padding:1px 7px;border-radius:999px;font-weight:500}
+.tag-badge.ok{background:var(--ok-soft);color:var(--ok)}
+.tag-badge.warn{background:var(--warn-soft);color:var(--warn)}
+.btn{height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:500}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-text)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ghost{background:transparent}
+.btn.icon{width:30px;height:30px;padding:0;border:0;background:transparent;color:var(--muted);border-radius:6px}
+.btn.icon:hover{background:var(--surface2)}
+.btn.icon.danger{background:transparent;color:var(--danger)}
+.btn.icon.danger:hover{background:var(--danger-soft)}
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-size:13px}
+.alert svg{margin-top:2px}
+.section-title{margin:0;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.link{padding:0;color:var(--accent-text)}
+.link:hover{text-decoration:underline}
+.muted{color:var(--muted)}
+
+/* ---------- Overview ---------- */
+.page-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.page-head h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.01em}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{padding:16px 18px}
+.stat .k{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.stat .v{font-size:28px;font-weight:600;line-height:1.2;margin-top:4px}
+.stat .s{font-size:12px;color:var(--muted)}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-head h2{margin:0;font-size:14px;font-weight:600}
+.scroll-x{overflow-x:auto}
+.recent{min-width:560px;display:flex;flex-direction:column}
+.recent button{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);text-align:left}
+.recent button:hover{background:var(--surface2)}
+
+/* ---------- Image view ---------- */
+.img-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px 24px}
+.crumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.img-head h1{margin:4px 0 0;font-size:24px;font-weight:500;letter-spacing:-.01em;word-break:break-all}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pull{display:flex;flex-direction:column;gap:6px;flex:0 1 460px;min-width:260px}
+.pull-box{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px}
+.pull-box .cmd{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.toolbar .filter{background:var(--surface);height:34px;border-radius:8px;flex:0 1 260px;min-width:160px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{height:32px;padding:0 12px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button.active{background:var(--accent-soft);color:var(--accent-text)}
+.selbar{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);font-weight:500}
+.selbar .btn{height:28px;border:0}
+.selbar .btn.ghost{color:var(--accent-text)}
+.table{min-width:860px}
+.trow{display:grid;grid-template-columns:40px minmax(0,2.2fr) minmax(0,1.6fr) 96px minmax(0,1.2fr) minmax(0,1.3fr) 104px;gap:12px;align-items:center;padding:6px 14px;border-bottom:1px solid var(--border)}
+.trow:hover{background:var(--surface2)}
+.trow.checked{background:var(--accent-soft)}
+.trow.open{background:var(--surface2)}
+.thead{padding:8px 14px;background:var(--surface2);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.thead:hover{background:var(--surface2)}
+.trow label{display:flex;align-items:center;justify-content:center}
+.trow input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--accent)}
+.cell{display:flex;align-items:center;gap:8px;min-width:0}
+.cell .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-link{font-size:13px;font-weight:500;color:var(--accent-text);text-align:left}
+.tag-link:hover{text-decoration:underline}
+.right{text-align:right}
+.arch{font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid var(--border);color:var(--muted)}
+.actions{display:flex;justify-content:flex-end;gap:2px}
+
+/* ---------- Drawer ---------- */
+.drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 14px;border-bottom:1px solid var(--border)}
+.drawer-head h2{margin:2px 0 0;font-size:18px;font-weight:500;word-break:break-all}
+.drawer-body{padding:16px 18px;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;font-size:13px}
+.kv .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.kv .wide{grid-column:span 2}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.tabs span{font-size:12px;padding:6px 10px;border-bottom:2px solid transparent;color:var(--muted);margin-bottom:-1px}
+.tabs span.active{border-bottom-color:var(--accent);color:var(--accent-text)}
+.layers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.layers li{display:flex;gap:10px;align-items:baseline;padding:6px 8px;border-radius:6px;background:var(--bg);font-size:12px}
+.layers .n{color:var(--muted);width:14px;text-align:right;font-size:11px}
+.layers .cmd{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layers .sz{color:var(--muted);font-size:11px}
+.labels{margin:0;display:grid;gap:6px;font-size:12px}
+.labels dt{color:var(--muted)}
+.labels dd{margin:0;word-break:break-all}
+
+/* ---------- Modal ---------- */
+.backdrop{position:absolute;inset:0;background:rgba(10,14,20,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal{width:460px;max-width:100%;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:0 20px 50px rgba(0,0,0,.3);padding:22px;display:flex;flex-direction:column;gap:14px}
+.modal h2{margin:0;font-size:17px;font-weight:600}
+.modal .tags{display:flex;flex-wrap:wrap;gap:6px}
+.modal .tags span{font-size:12px;padding:3px 8px;border-radius:6px;background:var(--surface2)}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+/* ======================================================================
+   Mock data. Everything shown here is obtainable from the Registry API v2
+   (catalog, tags/list, manifests, config blobs) or derived from it.
+   ====================================================================== */
+const REGISTRY = 'registry.example.com';
+
+const API_TAGS = [
+  { tag:'main',               d:'c41d0e7b2f98', size:'182.6 MB', arch:['linux/amd64','linux/arm64'], when:'40 min ago', date:'7 Oct 2026, 11:52' },
+  { tag:'develop',            d:'77f0e2d4c9b1', size:'184.1 MB', arch:['linux/amd64'],               when:'1 h ago',    date:'7 Oct 2026, 11:08' },
+  { tag:'sha-9f3a1c2',        d:'77f0e2d4c9b1', size:'184.1 MB', arch:['linux/amd64'],               when:'1 h ago',    date:'7 Oct 2026, 11:08' },
+  { tag:'v2.6.0',             d:'8f1c2a9b4e7d', size:'182.4 MB', arch:['linux/amd64','linux/arm64'], when:'2 h ago',    date:'7 Oct 2026, 09:14' },
+  { tag:'latest',             d:'8f1c2a9b4e7d', size:'182.4 MB', arch:['linux/amd64','linux/arm64'], when:'2 h ago',    date:'7 Oct 2026, 09:14' },
+  { tag:'nightly-2026-10-06', d:'1c6d9e8f2a34', size:'183.8 MB', arch:['linux/amd64','linux/arm64'], when:'yesterday',  date:'6 Oct 2026, 03:00' },
+  { tag:'sha-b77e04d',        d:'1c6d9e8f2a34', size:'183.8 MB', arch:['linux/amd64','linux/arm64'], when:'yesterday',  date:'6 Oct 2026, 02:41' },
+  { tag:'nightly-2026-10-05', d:'62b4a1c3d5e7', size:'183.5 MB', arch:['linux/amd64','linux/arm64'], when:'2 d ago',    date:'5 Oct 2026, 03:00' },
+  { tag:'v2.5.3',             d:'3b9e71f0ac52', size:'181.9 MB', arch:['linux/amd64','linux/arm64'], when:'3 d ago',    date:'4 Oct 2026, 17:02' },
+  { tag:'v2.5.2',             d:'a07c55d1e3b8', size:'181.7 MB', arch:['linux/amd64','linux/arm64'], when:'9 d ago',    date:'28 Sep 2026, 15:30' },
+  { tag:'v2.5.1',             d:'5d2f8c0b91aa', size:'180.2 MB', arch:['linux/amd64','linux/arm64'], when:'16 d ago',   date:'21 Sep 2026, 10:12' },
+  { tag:'v2.5.0',             d:'e9a3b6c7d012', size:'180.0 MB', arch:['linux/amd64','linux/arm64'], when:'23 d ago',   date:'14 Sep 2026, 18:45' },
+];
+const GENERIC_TAGS = [
+  { tag:'latest', d:'4e1f0a9c8b7d', size:'96.3 MB', arch:['linux/amd64','linux/arm64'], when:'5 h ago',  date:'7 Oct 2026, 07:20' },
+  { tag:'v1.4.2', d:'4e1f0a9c8b7d', size:'96.3 MB', arch:['linux/amd64','linux/arm64'], when:'5 h ago',  date:'7 Oct 2026, 07:20' },
+  { tag:'v1.4.1', d:'2a3b4c5d6e7f', size:'96.1 MB', arch:['linux/amd64','linux/arm64'], when:'6 d ago',  date:'1 Oct 2026, 12:02' },
+  { tag:'v1.4.0', d:'9f8e7d6c5b4a', size:'95.8 MB', arch:['linux/amd64'],               when:'12 d ago', date:'25 Sep 2026, 09:40' },
+  { tag:'v1.3.9', d:'0a1b2c3d4e5f', size:'95.2 MB', arch:['linux/amd64'],               when:'31 d ago', date:'6 Sep 2026, 16:11' },
+];
+const IMAGES = {
+  'alpine':3, 'registry':2,
+  'backend/api':API_TAGS.length, 'backend/worker':9, 'backend/scheduler':6,
+  'frontend/web':14, 'frontend/admin':8,
+  'infra/nginx':5, 'infra/postgres':4, 'infra/redis':3,
+  'tools/ci-runner':11, 'tools/sbom-scanner':7,
+};
+const TREE = [
+  { kind:'image', name:'alpine' },
+  { kind:'group', name:'backend/',  images:['backend/api','backend/worker','backend/scheduler'] },
+  { kind:'group', name:'frontend/', images:['frontend/web','frontend/admin'] },
+  { kind:'group', name:'infra/',    images:['infra/nginx','infra/postgres','infra/redis'] },
+  { kind:'image', name:'registry' },
+  { kind:'group', name:'tools/',    images:['tools/ci-runner','tools/sbom-scanner'] },
+];
+const LAYERS = [
+  ['FROM alpine:3.20','7.8 MB'],['RUN apk add --no-cache ca-certificates tzdata','3.1 MB'],['WORKDIR /app','0 B'],
+  ['COPY --from=build /out/api /app/api','64.2 MB'],['COPY config/ /app/config/','12 KB'],['ENV APP_ENV=production','0 B'],
+  ['EXPOSE 8080','0 B'],['ENTRYPOINT ["/app/api"]','0 B'],
+];
+const LABELS = [
+  ['org.opencontainers.image.source','https://git.example.com/backend/api'],
+  ['org.opencontainers.image.revision','9f3a1c2'],
+  ['org.opencontainers.image.version','2.6.0'],
+];
+const RECENT = [
+  { image:'backend/api',     tag:'main',    when:'40 min ago', size:'182.6 MB' },
+  { image:'backend/api',     tag:'develop', when:'1 h ago',    size:'184.1 MB' },
+  { image:'backend/api',     tag:'v2.6.0',  when:'2 h ago',    size:'182.4 MB' },
+  { image:'frontend/web',    tag:'v1.4.2',  when:'5 h ago',    size:'96.3 MB' },
+  { image:'infra/nginx',     tag:'latest',  when:'yesterday',  size:'41.0 MB' },
+  { image:'tools/ci-runner', tag:'v0.9.1',  when:'2 d ago',    size:'312.7 MB' },
+];
+const fullDigest = d => d + 'f0e1d2c3b4a5968778695a4b3c2d1e0f0e1d2c3b4a5968778695a4b3c2d1e0';
+const tagsFor = name => name === 'backend/api' ? API_TAGS : GENERIC_TAGS.slice(0, Math.min(IMAGES[name] || 5, GENERIC_TAGS.length));
+
+/* ---------- Icons (inline stroke SVG) ---------- */
+const svg = (w, body) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const I = {
+  cube:    w => svg(w, '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'),
+  cubeS:   w => svg(w, '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>'),
+  chevD:   w => svg(w, '<polyline points="6 9 12 15 18 9"/>'),
+  chevR:   w => svg(w, '<polyline points="9 18 15 12 9 6"/>'),
+  search:  w => svg(w, '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  filter:  w => svg(w, '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>'),
+  moon:    w => svg(w, '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'),
+  folder:  w => svg(w, '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>'),
+  copy:    w => svg(w, '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+  layers:  w => svg(w, '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>'),
+  trash:   w => svg(w, '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+  x:       w => svg(w, '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'),
+  warn:    w => svg(w, '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+  refresh: w => svg(w, '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>'),
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- State (expanded groups persist in localStorage) ---------- */
+const LS = 'registry-gui-mockup';
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) {}
+const state = {
+  expanded: saved.expanded || { 'backend/':true, 'frontend/':false, 'infra/':true, 'tools/':false },
+  selected: saved.selected !== undefined ? saved.selected : 'backend/api',
+  drawer:   saved.drawer !== undefined ? saved.drawer : 'v2.6.0',
+  checked:  {},
+  confirm:  null,
+  sort:     'date',
+  q:        '',
+};
+function persist() {
+  try { localStorage.setItem(LS, JSON.stringify({ expanded: state.expanded, selected: state.selected, drawer: state.drawer })); } catch (e) {}
+}
+function set(patch) { Object.assign(state, patch); persist(); render(); }
+
+/* ---------- Theme ---------- */
+function applyTheme() {
+  try {
+    const t = localStorage.getItem(LS + ':theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+}
+function toggleTheme() {
+  const root = document.documentElement;
+  const isDark = root.getAttribute('data-theme') === 'dark' ||
+    (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(LS + ':theme', next); } catch (e) {}
+}
+applyTheme();
+
+/* ---------- Render ---------- */
+function render() {
+  const sel = state.selected;
+  const all = sel ? tagsFor(sel) : [];
+  const byDigest = {};
+  all.forEach(t => (byDigest[t.d] = byDigest[t.d] || []).push(t.tag));
+  const q = state.q.toLowerCase();
+  let list = all.filter(t => !q || t.tag.toLowerCase().includes(q));
+  if (state.sort === 'name') list = [...list].sort((a, b) => a.tag.localeCompare(b.tag, undefined, { numeric: true }));
+  const newest = all.length ? all[0].tag : '';
+  const checkedCount = Object.keys(state.checked).length;
+  const allChecked = list.length > 0 && list.every(t => state.checked[t.tag]);
+  const dTag = all.find(t => t.tag === state.drawer);
+
+  document.getElementById('app').innerHTML = `
+    ${topbar()}
+    <div class="layout">
+      ${sidebar()}
+      <section class="content">
+        ${sel ? imageView() : overview()}
+      </section>
+      ${dTag ? drawer(dTag) : ''}
+    </div>
+    ${state.confirm ? modal() : ''}
+  `;
+
+  function topbar() {
+    return `
+    <header class="topbar">
+      <a class="brand" href="#"><span class="brand-mark">${I.cube(16)}</span>Registry GUI</a>
+      <button class="pill" type="button" aria-label="Switch registry"><span class="dot"></span><span class="mono" style="font-size:13px">${REGISTRY}</span>${I.chevD(14)}</button>
+      <div class="spacer"></div>
+      <label class="search">${I.search(16)}<input type="search" placeholder="Search images and tags  ·  Ctrl+K"></label>
+      <button class="iconbtn" type="button" data-act="theme" aria-label="Toggle dark mode">${I.moon(16)}</button>
+    </header>`;
+  }
+
+  function sidebar() {
+    const rows = [];
+    TREE.forEach(node => {
+      if (node.kind === 'image') { rows.push(item(node.name, node.name, 0)); return; }
+      const open = !!state.expanded[node.name];
+      rows.push(`<button type="button" class="group" data-act="toggle" data-group="${esc(node.name)}" aria-expanded="${open}">
+        <span class="chev">${I.chevR(14)}</span><span class="folder">${I.folder(16)}</span>
+        <span class="label">${esc(node.name)}</span><span class="count">${node.images.length} images</span></button>`);
+      if (open) node.images.forEach(img => rows.push(item(img, img.slice(node.name.length), 1)));
+    });
+    function item(name, label, depth) {
+      const cur = state.selected === name;
+      return `<button type="button" class="item${cur ? ' current' : ''}" data-act="select" data-image="${esc(name)}" ${cur ? 'aria-current="page"' : ''} style="padding-left:${8 + depth * 22}px">
+        <span class="cube">${I.cubeS(16)}</span><span class="label">${esc(label)}</span><span class="badge">${IMAGES[name] || 5} tags</span></button>`;
+    }
+    return `
+    <aside class="sidebar">
+      <div class="side-head">
+        <div class="side-title"><h2>Repositories</h2><span>${Object.keys(IMAGES).length} images · 4 namespaces</span></div>
+        <label class="filter">${I.filter(14)}<input type="text" placeholder="Filter repositories"></label>
+      </div>
+      <nav class="tree" aria-label="Repository tree">${rows.join('')}</nav>
+    </aside>`;
+  }
+
+  function overview() {
+    return `
+    <div class="page-head">
+      <div><h1>${REGISTRY}</h1><div class="muted" style="margin-top:2px">Registry API v2 · delete enabled</div></div>
+      <button class="btn" type="button">${I.refresh(14)}Refresh</button>
+    </div>
+    <div class="stats">
+      <div class="card stat"><div class="k">Images</div><div class="v">12</div><div class="s">in 4 namespaces</div></div>
+      <div class="card stat"><div class="k">Tags</div><div class="v">143</div><div class="s">across 12 images</div></div>
+      <div class="card stat"><div class="k">Unique digests</div><div class="v">97</div><div class="s">46 tags share a digest</div></div>
+      <div class="card stat"><div class="k">Last created</div><div class="v">40 min</div><div class="s">backend/api:main</div></div>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div class="card-head"><h2>Recently created</h2><span class="muted" style="font-size:12px">last 7 days</span></div>
+      <div class="scroll-x"><div class="recent">
+        ${RECENT.map(p => `<button type="button" data-act="open-recent" data-image="${esc(p.image)}" data-tag="${esc(p.tag)}">
+          <span style="font-weight:500">${esc(p.image)}</span>
+          <span class="mono" style="font-size:13px;color:var(--accent-text)">${esc(p.tag)}</span>
+          <span class="muted">${esc(p.when)}</span>
+          <span class="mono right" style="font-size:13px">${esc(p.size)}</span></button>`).join('')}
+      </div></div>
+    </div>`;
+  }
+
+  function imageView() {
+    const ns = sel.includes('/') ? sel.split('/')[0] : 'library';
+    const rows = list.map(t => {
+      const others = byDigest[t.d].filter(x => x !== t.tag);
+      const checked = !!state.checked[t.tag];
+      return `<div class="trow${checked ? ' checked' : state.drawer === t.tag ? ' open' : ''}">
+        <label><input type="checkbox" data-act="check" data-tag="${esc(t.tag)}" ${checked ? 'checked' : ''} aria-label="Select tag ${esc(t.tag)}"></label>
+        <div class="cell">
+          <button type="button" class="mono tag-link ell" data-act="open" data-tag="${esc(t.tag)}">${esc(t.tag)}</button>
+          ${t.tag === newest ? '<span class="tag-badge ok">newest</span>' : ''}
+        </div>
+        <div class="cell">
+          <span class="mono ell" style="font-size:12px;color:var(--muted)">sha256:${t.d}</span>
+          ${others.length ? `<span class="tag-badge warn" title="Same digest as ${esc(others.join(', '))}">= ${esc(others.join(', '))}</span>` : ''}
+        </div>
+        <span class="mono right" style="font-size:13px">${t.size}</span>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${t.arch.map(a => `<span class="mono arch">${a}</span>`).join('')}</div>
+        <span class="muted" title="${esc(t.date)}">${esc(t.when)}</span>
+        <div class="actions">
+          <button type="button" class="btn icon" aria-label="Copy pull command for ${esc(t.tag)}">${I.copy(15)}</button>
+          <button type="button" class="btn icon" data-act="open" data-tag="${esc(t.tag)}" aria-label="Show details for ${esc(t.tag)}">${I.layers(15)}</button>
+          <button type="button" class="btn icon danger" data-act="remove" data-tag="${esc(t.tag)}" aria-label="Delete ${esc(t.tag)}">${I.trash(15)}</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="img-head">
+      <div style="min-width:0">
+        <nav class="crumb" aria-label="Breadcrumb"><button type="button" class="link" data-act="home">${REGISTRY}</button><span>/</span><span>${esc(ns)}</span></nav>
+        <h1 class="mono">${esc(sel)}</h1>
+        <div class="chips">
+          <span class="chip">${all.length} tags</span>
+          <span class="chip">${Object.keys(byDigest).length} digests</span>
+          <span class="chip">1.9 GB compressed</span>
+          <span class="chip ok">created 40 min ago</span>
+        </div>
+      </div>
+      <div class="pull">
+        <span class="muted" style="font-size:12px">Pull the newest tag</span>
+        <div class="pull-box mono"><span class="muted">$</span><span class="cmd">docker pull ${REGISTRY}/${esc(sel)}:${esc(newest)}</span>
+          <button type="button" class="btn icon" aria-label="Copy pull command">${I.copy(15)}</button></div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <label class="filter">${I.search(14)}<input type="text" id="q" value="${esc(state.q)}" placeholder="Filter tags"></label>
+      <div class="seg">
+        <button type="button" data-act="sort" data-sort="date" class="${state.sort === 'date' ? 'active' : ''}">Newest</button>
+        <button type="button" data-act="sort" data-sort="name" class="${state.sort === 'name' ? 'active' : ''}">Name</button>
+      </div>
+      <div class="spacer"></div>
+      ${checkedCount ? `<div class="selbar"><span>${checkedCount} selected</span>
+        <button type="button" class="btn ghost" data-act="clear">Clear</button>
+        <button type="button" class="btn danger" data-act="confirm-selected">${I.trash(14)}Delete</button></div>` : ''}
+      <span class="muted" style="font-size:13px">${list.length} of ${all.length} tags</span>
+    </div>
+    <div class="card" style="overflow:hidden"><div class="scroll-x"><div class="table">
+      <div class="trow thead">
+        <label><input type="checkbox" data-act="check-all" ${allChecked ? 'checked' : ''} aria-label="Select all visible tags"></label>
+        <span>Tag</span><span>Digest</span><span class="right">Size</span><span>Platforms</span><span>Created</span><span></span>
+      </div>
+      ${rows}
+    </div></div></div>`;
+  }
+
+  function drawer(t) {
+    const others = byDigest[t.d].filter(x => x !== t.tag);
+    return `
+    <aside class="drawer" aria-label="Tag details">
+      <div class="drawer-head">
+        <div style="min-width:0"><div class="muted" style="font-size:12px">${esc(sel)}</div><h2 class="mono">${esc(t.tag)}</h2></div>
+        <button type="button" class="btn icon" data-act="close" aria-label="Close details" style="width:32px;height:32px">${I.x(16)}</button>
+      </div>
+      <div class="drawer-body">
+        <div class="kv">
+          <div><div class="k">Created</div><div>${esc(t.date)}</div></div>
+          <div><div class="k">Size</div><div class="mono">${t.size}</div></div>
+          <div class="wide"><div class="k">Digest</div><div class="mono" style="font-size:12px;word-break:break-all">sha256:${fullDigest(t.d)}</div></div>
+        </div>
+        ${others.length ? `<div class="alert">${I.warn(16)}<span>Same digest as <span class="mono" style="font-weight:500">${esc(others.join(', '))}</span>. Deleting one deletes both.</span></div>` : ''}
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn primary" style="flex:1">${I.copy(14)}Copy pull</button>
+          <button type="button" class="btn" style="flex:1">Dockerfile</button>
+          <button type="button" class="btn icon danger" data-act="remove" data-tag="${esc(t.tag)}" aria-label="Delete this tag" style="width:34px;height:34px;border:1px solid var(--border)">${I.trash(15)}</button>
+        </div>
+        <div>
+          <div class="tabs">${t.arch.map((a, i) => `<span class="mono${i === 0 ? ' active' : ''}">${a}</span>`).join('')}</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><h3 class="section-title">Layers</h3><span class="muted" style="font-size:12px">${LAYERS.length} · ${t.size}</span></div>
+          <ol class="layers">${LAYERS.map((l, i) => `<li><span class="mono n">${i + 1}</span><span class="mono cmd">${esc(l[0])}</span><span class="mono sz">${l[1]}</span></li>`).join('')}</ol>
+        </div>
+        <div>
+          <h3 class="section-title" style="margin-bottom:8px">Labels</h3>
+          <dl class="labels">${LABELS.map(l => `<div><dt class="mono">${esc(l[0])}</dt><dd class="mono">${esc(l[1])}</dd></div>`).join('')}</dl>
+        </div>
+      </div>
+    </aside>`;
+  }
+
+  function modal() {
+    const tags = state.confirm;
+    return `
+    <div class="backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-title">
+        <h2 id="del-title">Delete ${tags.length} ${tags.length === 1 ? 'tag' : 'tags'} from ${esc(sel)}?</h2>
+        <div class="tags">${tags.map(t => `<span class="mono">${esc(t)}</span>`).join('')}</div>
+        <div class="alert">${I.warn(16)}<span>The registry deletes by digest. Every tag that points at the same digest is removed too. Run garbage collection afterwards to free disk space.</span></div>
+        <div class="foot">
+          <button type="button" class="btn" data-act="cancel">Cancel</button>
+          <button type="button" class="btn danger" data-act="delete">Delete tags</button>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+/* ---------- Events (delegated) ---------- */
+document.getElementById('app').addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+  if (act === 'theme') return toggleTheme();
+  if (act === 'toggle') { state.expanded[el.dataset.group] = !state.expanded[el.dataset.group]; return set({}); }
+  if (act === 'select') return set({ selected: el.dataset.image, drawer: null, checked: {}, q: '' });
+  if (act === 'home') return set({ selected: null, drawer: null, checked: {}, q: '' });
+  if (act === 'open-recent') return set({ selected: el.dataset.image, drawer: el.dataset.tag, checked: {}, q: '' });
+  if (act === 'open') return set({ drawer: el.dataset.tag });
+  if (act === 'close') return set({ drawer: null });
+  if (act === 'sort') return set({ sort: el.dataset.sort });
+  if (act === 'clear') return set({ checked: {} });
+  if (act === 'remove') return set({ confirm: [el.dataset.tag] });
+  if (act === 'confirm-selected') return set({ confirm: Object.keys(state.checked) });
+  if (act === 'cancel') return set({ confirm: null });
+  if (act === 'delete') return set({ confirm: null, checked: {} });
+});
+document.getElementById('app').addEventListener('change', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  if (el.dataset.act === 'check') {
+    if (el.checked) state.checked[el.dataset.tag] = true; else delete state.checked[el.dataset.tag];
+    return set({});
+  }
+  if (el.dataset.act === 'check-all') {
+    const all = state.selected ? tagsFor(state.selected) : [];
+    const q = state.q.toLowerCase();
+    const visible = all.filter(t => !q || t.tag.toLowerCase().includes(q));
+    const checked = {};
+    if (el.checked) visible.forEach(t => checked[t.tag] = true);
+    return set({ checked });
+  }
+});
+document.getElementById('app').addEventListener('input', e => {
+  if (e.target.id === 'q') {
+    state.q = e.target.value;
+    const pos = e.target.selectionStart;
+    render();
+    const q = document.getElementById('q');
+    if (q) { q.focus(); q.setSelectionRange(pos, pos); }
+  }
+});
+
+render();
+</script>
+</body>
+</html>
