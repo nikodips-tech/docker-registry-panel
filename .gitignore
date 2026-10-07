@@ -30,3 +30,6 @@ coverage
 
 # Local registry data for dev
 dev/registry/data
+
+# Local deployment file (the tracked one is docker-compose.example.yml)
+docker-compose.yml
