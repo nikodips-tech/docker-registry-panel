@@ -228,6 +228,9 @@ export function normalizeCommand(createdBy: string): string {
   // BuildKit: RUN with build args prefix "|N k=v ..." then the shell form
   const bkRun = s.match(/^RUN (?:\|\d+(?:\s+\S+?=\S*)*\s+)?\/bin\/sh -c (.*)$/s)
   if (bkRun) return 'RUN ' + bkRun[1]!.trim()
+  // BuildKit renders EXPOSE as a Go map: EXPOSE map[8080/tcp:{} 9090/tcp:{}]
+  const expose = s.match(/^EXPOSE map\[(.*)\]$/)
+  if (expose) return 'EXPOSE ' + expose[1]!.replace(/:\{\}/g, '')
   return s
 }
 

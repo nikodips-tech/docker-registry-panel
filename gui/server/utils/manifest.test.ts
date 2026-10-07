@@ -143,6 +143,7 @@ describe('normalizeCommand', () => {
     expect(normalizeCommand('RUN /bin/sh -c echo hi # buildkit')).toBe('RUN echo hi')
     expect(normalizeCommand('COPY seed.sh /app/api # buildkit')).toBe('COPY seed.sh /app/api')
     expect(normalizeCommand('ENV APP_ENV=production')).toBe('ENV APP_ENV=production')
+    expect(normalizeCommand('EXPOSE map[8080/tcp:{} 9090/udp:{}]')).toBe('EXPOSE 8080/tcp 9090/udp')
     expect(normalizeCommand('ADD alpine-minirootfs-3.20.10-x86_64.tar.gz / # buildkit')).toBe('ADD alpine-minirootfs-3.20.10-x86_64.tar.gz /')
   })
 })
