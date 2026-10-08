@@ -8,6 +8,7 @@
 <p align="center">
   <a href="https://hub.docker.com/r/dipstech/docker-registry-panel"><img alt="Docker Hub" src="https://img.shields.io/badge/docker%20hub-docker--registry--panel-2496ED?logo=docker&logoColor=white"></a>
   <img alt="Registry API" src="https://img.shields.io/badge/registry-Distribution%20v2%20%2F%20v3%20%C2%B7%20OCI-1F4FE0">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
   <img alt="Nuxt" src="https://img.shields.io/badge/Nuxt%203-SPA%20%2B%20Nitro-00DC82?logo=nuxt.js&logoColor=white">
 </p>
 
@@ -165,3 +166,9 @@ Inspired by [joxit/docker-registry-ui](https://github.com/Joxit/docker-registry-
 from it: the registry access layer is written from the
 [OCI Distribution](https://github.com/opencontainers/distribution-spec) and
 [OCI Image](https://github.com/opencontainers/image-spec) specifications.
+
+## License
+
+[MIT](LICENSE) © 2026 Nicola Di Pietro
+
+The bundled IBM Plex fonts are distributed under the SIL Open Font License 1.1.

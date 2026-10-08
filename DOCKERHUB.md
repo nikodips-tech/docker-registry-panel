@@ -63,3 +63,7 @@ services:
 - The registry deletes manifests by digest: every tag pointing at the same digest is removed together.
   The panel warns before you confirm. Run `registry garbage-collect` afterwards to free disk space.
 - The dates shown are image build dates (`created`); the registry API does not record push dates.
+
+## License
+
+MIT. The bundled IBM Plex fonts are under the SIL Open Font License 1.1.
