@@ -149,6 +149,12 @@ svg { flex: none; }
 .archs { display: flex; flex-wrap: wrap; gap: 4px; }
 .actions { display: flex; justify-content: flex-end; gap: 2px; }
 .table-empty { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
+.empty-repo { padding: 18px; min-width: 0; display: flex; flex-direction: column; gap: 14px; font-size: 13px; }
+.empty-repo p { margin: 0; }
+.empty-repo-title { font-weight: 600; font-size: 14px; }
+.empty-repo-text { display: flex; flex-direction: column; gap: 4px; }
+.empty-repo-step { display: flex; flex-direction: column; gap: 6px; }
+.empty-repo .pull-box .cmd { text-overflow: clip; overflow-x: auto; padding: 2px 0; }
 
 /* ---------- Drawer ---------- */
 .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 18px 14px; border-bottom: 1px solid var(--border); }
