@@ -1,5 +1,5 @@
 # Build context: the gui/ directory.
-#   docker build -t docker-registry-gui gui/
+#   docker build -t docker-registry-panel gui/
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./

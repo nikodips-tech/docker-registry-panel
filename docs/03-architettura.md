@@ -123,8 +123,8 @@ CMD ["node", ".output/server/index.mjs"]
 
 ```yaml
 services:
-  registry-gui:
-    image: <nostro-registry>/tools/docker-registry-gui:latest
+  registry-panel:
+    image: <utente-dockerhub>/docker-registry-panel:latest
     environment:
       REGISTRY_URL: https://registry.example.com
       REGISTRY_USERNAME: ${REGISTRY_USERNAME}

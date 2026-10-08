@@ -14,7 +14,7 @@ const emit = defineEmits<{ home: [], toggleTheme: [] }>()
       class="brand"
       href="/"
       @click.prevent="emit('home')"
-    ><span class="brand-mark"><AppIcon name="cube" /></span>Registry GUI</a>
+    ><span class="brand-mark"><AppIcon name="cube" /></span>Registry Panel</a>
     <span
       class="pill"
       :title="health?.ok ? 'Registry reachable' : (health?.error ?? 'Checking registry…')"

@@ -4,7 +4,7 @@
 services:
   registry:
     image: registry:2
-    container_name: registry-gui-dev-registry
+    container_name: registry-panel-dev-registry
     ports:
       - "5500:5000"
     environment:

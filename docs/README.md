@@ -1,4 +1,4 @@
-# Docker Registry GUI — documentazione
+# Docker Registry Panel — documentazione
 
 Interfaccia web per il nostro Docker Registry privato (Distribution v2/v3), costruita da zero
 in sostituzione di [joxit/docker-registry-ui](https://github.com/Joxit/docker-registry-ui).

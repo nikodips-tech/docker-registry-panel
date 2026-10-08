@@ -22,7 +22,7 @@ async function loadHealth() {
 const title = computed(() => health.value?.title ?? 'registry')
 const pullUrl = computed(() => health.value?.pullUrl ?? title.value)
 const deleteEnabled = computed(() => health.value?.deleteEnabled ?? false)
-useHead({ title: computed(() => (ui.selectedImage.value ? `${ui.selectedImage.value} · ${title.value}` : `${title.value} · Registry GUI`)) })
+useHead({ title: computed(() => (ui.selectedImage.value ? `${ui.selectedImage.value} · ${title.value}` : `${title.value} · Registry Panel`)) })
 
 // ---------- catalog ----------
 const repositories = ref<RepositorySummary[]>([])

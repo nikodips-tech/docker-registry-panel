@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Registry GUI',
+      title: 'Registry Panel',
       meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
     },
   },

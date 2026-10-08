@@ -1,11 +1,10 @@
 # Example deployment next to a private registry. Copy to docker-compose.yml and adjust.
-# The GUI container replaces joxit/docker-registry-ui one to one: the browser only talks
-# to the GUI, the GUI talks to the registry with the credentials below.
+# The browser only talks to the panel; the panel talks to the registry with the credentials below.
 services:
-  registry-gui:
-    build: ./gui
-    # or, once published:
-    # image: registry.example.com/tools/docker-registry-gui:latest
+  registry-panel:
+    image: DOCKERHUB_USER/docker-registry-panel:latest
+    # or build from source:
+    # build: ./gui
     restart: unless-stopped
     environment:
       REGISTRY_URL: https://registry.example.com

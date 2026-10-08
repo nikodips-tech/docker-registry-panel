@@ -16,7 +16,7 @@ interface Persisted {
   sort: SortMode
 }
 
-const LS_KEY = 'registry-gui'
+const LS_KEY = 'registry-panel'
 
 function load(): Persisted {
   const base: Persisted = { expanded: {}, theme: null, sort: 'date' }
