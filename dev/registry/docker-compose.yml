@@ -1,0 +1,13 @@
+# Local test registry for development. Not used in production.
+#   docker compose -f dev/registry/docker-compose.yml up -d
+#   sh dev/registry/seed.sh
+services:
+  registry:
+    image: registry:2
+    container_name: registry-panel-dev-registry
+    ports:
+      - "5500:5000"
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - ./data:/var/lib/registry

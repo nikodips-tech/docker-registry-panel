@@ -1,0 +1,25 @@
+{
+  "architecture": "amd64",
+  "os": "linux",
+  "created": "2024-03-01T10:00:00.123456789Z",
+  "config": {
+    "User": "node",
+    "ExposedPorts": { "3000/tcp": {}, "9229/tcp": {} },
+    "Env": ["PATH=/usr/local/bin:/usr/bin:/bin", "NODE_ENV=production"],
+    "Cmd": ["node", "server.js"],
+    "WorkingDir": "/srv",
+    "Labels": { "maintainer": "team@example.com" }
+  },
+  "history": [
+    { "created": "2024-02-01T00:00:00Z", "created_by": "/bin/sh -c #(nop) ADD file:abc123 in / " },
+    { "created": "2024-02-01T00:00:00Z", "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]", "empty_layer": true },
+    { "created": "2024-03-01T09:58:00Z", "created_by": "/bin/sh -c apk add --no-cache nodejs" },
+    { "created": "2024-03-01T09:59:00Z", "created_by": "/bin/sh -c #(nop) WORKDIR /srv", "empty_layer": true },
+    { "created": "2024-03-01T09:59:30Z", "created_by": "/bin/sh -c #(nop) COPY dir:def456 in /srv " },
+    { "created": "2024-03-01T10:00:00Z", "created_by": "/bin/sh -c #(nop)  CMD [\"node\" \"server.js\"]", "empty_layer": true }
+  ],
+  "rootfs": {
+    "type": "layers",
+    "diff_ids": ["sha256:aaaa", "sha256:bbbb", "sha256:cccc"]
+  }
+}

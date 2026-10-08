@@ -4,6 +4,22 @@ export default defineNuxtConfig({
   // Internal console: pure SPA, no SSR (see docs/03-architettura.md)
   ssr: false,
   devtools: { enabled: true },
+  app: {
+    head: {
+      title: 'Registry Panel',
+      meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+    },
+  },
+  // Fonts are bundled from node_modules and served by this app, never from Google Fonts.
+  css: [
+    '@fontsource/ibm-plex-sans/latin-400.css',
+    '@fontsource/ibm-plex-sans/latin-500.css',
+    '@fontsource/ibm-plex-sans/latin-600.css',
+    '@fontsource/ibm-plex-mono/latin-400.css',
+    '@fontsource/ibm-plex-mono/latin-500.css',
+    '~/assets/css/tokens.css',
+    '~/assets/css/app.css',
+  ],
   runtimeConfig: {
     // Server-only: read from env (NUXT_ prefix) or set below
     registryUrl: process.env.REGISTRY_URL ?? '',
