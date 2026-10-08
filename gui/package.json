@@ -1,6 +1,6 @@
 {
   "name": "docker-registry-panel",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Web panel for private Docker / OCI registries",
   "license": "MIT",
   "repository": {
