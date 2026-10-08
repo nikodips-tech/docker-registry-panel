@@ -45,6 +45,9 @@ const visible = computed(() => {
   if (props.sort === 'name') list.sort((a, b) => compareTags(a.tag, b.tag))
   return list
 })
+const removeCommand = computed(() => `docker compose exec registry rm -rf /var/lib/registry/docker/registry/v2/repositories/${props.name}`)
+const gcCommand = 'docker compose exec registry registry garbage-collect /etc/docker/registry/config.yml'
+
 const brokenCount = computed(() => props.tags.filter(t => t.error).length)
 const allVisibleChecked = computed(() => {
   const selectable = visible.value.filter(t => t.digest)
@@ -194,10 +197,65 @@ function others(t: TagRow): string[] {
           /> Resolving manifests…
         </div>
         <div
-          v-else-if="!visible.length"
+          v-else-if="!tags.length && !error"
+          class="empty-repo"
+        >
+          <p class="empty-repo-title">
+            This repository has no tags.
+          </p>
+          <p>
+            The registry keeps a repository listed after its last tag is deleted: its API has no call to remove a
+            repository, so it can only be removed on the registry host. Run these on the host, from the folder
+            of the registry's docker compose (the service is assumed to be called <span class="mono">registry</span>,
+            with the default storage path).
+          </p>
+          <div class="empty-repo-step">
+            <span class="muted">1. Remove the repository folder</span>
+            <div class="pull-box mono">
+              <span class="muted">$</span>
+              <span class="cmd">{{ removeCommand }}</span>
+              <button
+                type="button"
+                class="btn icon"
+                aria-label="Copy remove command"
+                title="Copy"
+                @click="emit('copy', removeCommand)"
+              >
+                <AppIcon
+                  name="copy"
+                  :size="15"
+                />
+              </button>
+            </div>
+          </div>
+          <div class="empty-repo-step">
+            <span class="muted">2. Free the disk space of the orphaned layers</span>
+            <div class="pull-box mono">
+              <span class="muted">$</span>
+              <span class="cmd">{{ gcCommand }}</span>
+              <button
+                type="button"
+                class="btn icon"
+                aria-label="Copy garbage collection command"
+                title="Copy"
+                @click="emit('copy', gcCommand)"
+              >
+                <AppIcon
+                  name="copy"
+                  :size="15"
+                />
+              </button>
+            </div>
+          </div>
+          <p class="muted">
+            Then press Refresh on the overview page to reload the repository list.
+          </p>
+        </div>
+        <div
+          v-else-if="!visible.length && tags.length"
           class="table-empty"
         >
-          {{ tags.length ? 'No tag matches the filter.' : 'This repository has no tags.' }}
+          No tag matches the filter.
         </div>
 
         <div
