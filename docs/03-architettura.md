@@ -124,7 +124,7 @@ CMD ["node", ".output/server/index.mjs"]
 ```yaml
 services:
   registry-panel:
-    image: <utente-dockerhub>/docker-registry-panel:latest
+    image: dipstech/docker-registry-panel:latest
     environment:
       REGISTRY_URL: https://registry.example.com
       REGISTRY_USERNAME: ${REGISTRY_USERNAME}

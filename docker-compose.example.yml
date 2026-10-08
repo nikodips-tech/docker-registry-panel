@@ -2,7 +2,7 @@
 # The browser only talks to the panel; the panel talks to the registry with the credentials below.
 services:
   registry-panel:
-    image: DOCKERHUB_USER/docker-registry-panel:latest
+    image: dipstech/docker-registry-panel:latest
     # or build from source:
     # build: ./gui
     restart: unless-stopped

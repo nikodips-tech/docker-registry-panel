@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://hub.docker.com/r/DOCKERHUB_USER/docker-registry-panel"><img alt="Docker Hub" src="https://img.shields.io/badge/docker%20hub-docker--registry--panel-2496ED?logo=docker&logoColor=white"></a>
+  <a href="https://hub.docker.com/r/dipstech/docker-registry-panel"><img alt="Docker Hub" src="https://img.shields.io/badge/docker%20hub-docker--registry--panel-2496ED?logo=docker&logoColor=white"></a>
   <img alt="Registry API" src="https://img.shields.io/badge/registry-Distribution%20v2%20%2F%20v3%20%C2%B7%20OCI-1F4FE0">
   <img alt="Nuxt" src="https://img.shields.io/badge/Nuxt%203-SPA%20%2B%20Nitro-00DC82?logo=nuxt.js&logoColor=white">
 </p>
@@ -58,7 +58,7 @@ docker run -d --name registry-panel -p 8080:3000 \
   -e REGISTRY_USERNAME=admin \
   -e REGISTRY_PASSWORD=secret \
   -e DELETE_IMAGES=true \
-  DOCKERHUB_USER/docker-registry-panel:latest
+  dipstech/docker-registry-panel:latest
 ```
 
 Then open <http://localhost:8080>.
@@ -68,7 +68,7 @@ With docker compose, see [`docker-compose.example.yml`](docker-compose.example.y
 ```yaml
 services:
   registry-panel:
-    image: DOCKERHUB_USER/docker-registry-panel:latest
+    image: dipstech/docker-registry-panel:latest
     restart: unless-stopped
     environment:
       REGISTRY_URL: https://registry.example.com

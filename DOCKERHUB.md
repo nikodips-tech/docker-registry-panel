@@ -7,7 +7,7 @@ share a digest, and delete safely.
 The panel has its own small backend that talks to the registry, so the browser never does:
 no CORS to configure, no registry credentials in the browser, manifests cached by digest.
 
-Source, screenshots and issues: https://github.com/GITHUB_USER/docker-registry-panel
+Source code, screenshots and issues on [GitHub](https://github.com/nikodips-tech/docker-registry-panel).
 
 ## Quick start
 
@@ -17,7 +17,7 @@ docker run -d --name registry-panel -p 8080:3000 \
   -e REGISTRY_USERNAME=admin \
   -e REGISTRY_PASSWORD=secret \
   -e DELETE_IMAGES=true \
-  DOCKERHUB_USER/docker-registry-panel:latest
+  dipstech/docker-registry-panel:latest
 ```
 
 Open http://localhost:8080.
@@ -27,7 +27,7 @@ Open http://localhost:8080.
 ```yaml
 services:
   registry-panel:
-    image: DOCKERHUB_USER/docker-registry-panel:latest
+    image: dipstech/docker-registry-panel:latest
     restart: unless-stopped
     environment:
       REGISTRY_URL: https://registry.example.com
