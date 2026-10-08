@@ -11,6 +11,7 @@ FROM node:22-alpine
 LABEL org.opencontainers.image.title="Docker Registry Panel" \
       org.opencontainers.image.description="Web UI for private Docker registries: browse repos and tags, inspect layers, delete by digest." \
       org.opencontainers.image.source="https://github.com/nikodips-tech/docker-registry-panel" \
+      org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.url="https://hub.docker.com/r/dipstech/docker-registry-panel"
 WORKDIR /app
 ENV NODE_ENV=production
